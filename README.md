@@ -4,7 +4,7 @@ A full-stack URL shortener application built with AdonisJS that creates short UR
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js (v20 or higher)
 - PostgreSQL
 - npm or yarn
 
@@ -63,7 +63,7 @@ npm install qrcode
 ### 4. Database Setup
 
 ```bash
-# Create database
+# Create your postgresql database with postgres user
 psql -U postgres
 CREATE DATABASE url_shortener_db;
 
