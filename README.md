@@ -167,3 +167,162 @@ As a user, I need to:
      - Automatic redirection when scanned
 
 Note: The basic template with form and display code is already provided. Students need to implement the functionality described above.
+
+
+# Deploying Your AdonisJS Application on Render
+
+This step-by-step guide will help you deploy your AdonisJS application on Render's cloud platform.
+
+## Prerequisites
+
+- A [Render account](https://render.com/signup)
+- Your AdonisJS project on [GitHub](https://github.com)
+- PostgreSQL database (Render provides a free tier)
+
+## 1. Project Preparation 🔧
+
+### 1.1 Environment Variables
+
+Create or update your `.env.example` file:
+
+```env
+PORT=3333
+HOST=0.0.0.0
+NODE_ENV=production
+APP_KEY=your-app-key
+DRIVE_DISK=local
+DB_CONNECTION=pg
+POSTGRES_HOST=your-db-host
+POSTGRES_PORT=5432
+POSTGRES_USER=your-db-user
+POSTGRES_PASSWORD=your-db-password
+POSTGRES_DB_NAME=your-db-name
+```
+
+### 1.2 Update package.json
+
+Add these deployment scripts:
+
+```json
+{
+  "scripts": {
+    "build": "node ace build --production",
+    "start": "node server.js",
+    "install-dependencies": "npm install"
+  }
+}
+```
+
+### 1.3 Database Configuration
+
+Update `config/database.ts`:
+
+```typescript
+import Env from '@ioc:Adonis/Core/Env'
+import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
+
+const databaseConfig: DatabaseConfig = {
+  connection: Env.get('DB_CONNECTION'),
+  connections: {
+    pg: {
+      client: 'pg',
+      connection: {
+        host: Env.get('POSTGRES_HOST'),
+        port: Env.get('POSTGRES_PORT'),
+        user: Env.get('POSTGRES_USER'),
+        password: Env.get('POSTGRES_PASSWORD'),
+        database: Env.get('POSTGRES_DB_NAME'),
+        ssl: {
+          rejectUnauthorized: false
+        }
+      }
+    }
+  }
+}
+
+export default databaseConfig
+```
+
+## 2. Setting Up Database on Render 💾
+
+1. Log in to [Render Dashboard](https://dashboard.render.com)
+2. Click "New +" → "PostgreSQL"
+3. Configure your database:
+   - Give it a name
+   - Choose region (closest to users)
+   - Select free plan
+4. **Save these credentials**:
+   - `Internal Database URL`
+   - `External Database URL`
+   - `Database Name`
+   - `User`
+   - `Password`
+   - `Host`
+   - `Port`
+
+## 3. Deploying Your Application 🚀
+
+### 3.1 Create Web Service
+
+1. Click "New +" → "Web Service"
+2. Connect your GitHub repo
+3. Configure service:
+   - **Name**: Your app name
+   - **Environment**: Node
+   - **Region**: Choose closest
+   - **Branch**: your branch
+   - **Build Command**: `npm run install-dependencies && npm run build`
+   - **Start Command**: `npm run start`
+
+### 3.2 Environment Variables Setup
+
+Add these in your Web Service's Environment section:
+
+```env
+PORT=3333
+HOST=0.0.0.0
+NODE_ENV=production
+APP_KEY=<your-app-key>
+DRIVE_DISK=local
+DB_CONNECTION=pg
+POSTGRES_HOST=<from-database-credentials>
+POSTGRES_PORT=5432
+POSTGRES_USER=<from-database-credentials>
+POSTGRES_PASSWORD=<from-database-credentials>
+POSTGRES_DB_NAME=<from-database-credentials>
+```
+
+## 4. Post-Deployment Steps ✅
+
+1. Run migrations:
+   - Go to Web Service → Shell
+   - Run: `node ace migration:run`
+
+2. Verify deployment:
+   - Wait for deployment to complete
+   - Click generated URL
+   - Check application status
+
+## Troubleshooting Guide 🔍
+
+### Database Connection Issues
+- ✓ Verify environment variables
+- ✓ Check database credentials
+- ✓ Confirm SSL configuration
+
+### Migration Failures
+- ✓ Check Render logs
+- ✓ Verify migration files
+- ✓ Test database access
+
+### Application Start Issues
+- ✓ Review build logs
+- ✓ Check dependencies
+- ✓ Verify start command
+
+## Useful Resources 📚
+
+- [Render Documentation](https://render.com/docs)
+- [AdonisJS Deployment Guide](https://docs.adonisjs.com/guides/deployment)
+- [PostgreSQL on Render](https://render.com/docs/databases)
+- [Node.js on Render](https://render.com/docs/deploy-node-express-app)
